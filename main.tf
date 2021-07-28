@@ -36,15 +36,9 @@ resource "aws_security_group" "app_server-sg" {
 }
 
 resource "aws_instance" "app_server" {
-  # ami           = "ami-830c94e3"
-  # instance_type = "t2.micro"
-
-  # tags = {
-  #   Name = var.instance_name
-  # }
   ami                         = lookup(var.awsprops, "ami")
   instance_type               = lookup(var.awsprops, "type")
-  subnet_id                   = lookup(var.awsprops, "subnet") #FFXsubnet2
+  subnet_id                   = lookup(var.awsprops, "subnet")
   associate_public_ip_address = lookup(var.awsprops, "publicip")
 
 
