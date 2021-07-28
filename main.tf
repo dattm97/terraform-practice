@@ -2,53 +2,27 @@ provider "aws" {
   region = lookup(var.awsprops, "region")
 }
 
-resource "aws_security_group" "app_server-sg" {
-  name        = lookup(var.awsprops, "secgroupname")
-  description = lookup(var.awsprops, "secgroupname")
-  vpc_id      = lookup(var.awsprops, "vpc")
-
-  // To Allow SSH Transport
-  ingress {
-    from_port   = 22
-    protocol    = "tcp"
-    to_port     = 22
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  // To Allow Port 80 Transport
-  ingress {
-    from_port   = 80
-    protocol    = "tcp"
-    to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_instance" "app_server" {
   ami                         = lookup(var.awsprops, "ami")
   instance_type               = lookup(var.awsprops, "type")
-  subnet_id                   = lookup(var.awsprops, "subnet")
   associate_public_ip_address = lookup(var.awsprops, "publicip")
-
-
+  subnet_id                   = aws_subnet.http.id
   vpc_security_group_ids = [
-    aws_security_group.app_server-sg.id
+    aws_security_group.app_server_sg.id
   ]
+
   tags = {
     Name        = lookup(var.instance_name, "name")
     Environment = lookup(var.instance_name, "environment")
   }
+}
 
-  depends_on = [aws_security_group.app_server-sg]
+# Attach floating ip on instance http
+resource "aws_eip" "public_http" {
+  vpc        = true
+  instance   = aws_instance.app_server.id
+  depends_on = [aws_internet_gateway.gw]
+  tags = {
+    Name = lookup(var.instance_name, "elasticIP")
+  }
 }
