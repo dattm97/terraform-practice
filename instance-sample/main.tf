@@ -6,7 +6,9 @@ resource "aws_instance" "app_server" {
   ami                         = lookup(var.awsprops, "ami")
   instance_type               = lookup(var.awsprops, "type")
   associate_public_ip_address = lookup(var.awsprops, "publicip")
+  key_name                    = aws_key_pair.user_key.key_name
   subnet_id                   = aws_subnet.http.id
+  user_data                   = file("scripts/first-boot.sh")
   vpc_security_group_ids = [
     aws_security_group.app_server_sg.id
   ]
