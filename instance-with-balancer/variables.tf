@@ -22,6 +22,6 @@ variable "vpc_cidr" {
 variable "network_http" {
   default = {
     subnet_name = "subnet_http"
-    cidr        = "172.31.1.0/24"
+    cidr        = "172.31.32.0/20"
   }
 }

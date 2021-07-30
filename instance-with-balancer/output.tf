@@ -1,7 +1,7 @@
-output "app_ip" {
+output "app_public_ip" {
   value = {
     for instance in aws_instance.instance-app :
-    instance.id => instance.private_ip
+    instance.id => instance.public_ip
   }
 }
 
