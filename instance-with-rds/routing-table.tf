@@ -73,13 +73,13 @@ module "aws_private_route_table_zb" {
 }
 
 # Associate private networks in zone A to private route table
-resource "aws_route_table_association" "route_sn_za_pro_pri_34" {
-  subnet_id      = module.aws_sn_za_pro_pri_34.id
+resource "aws_route_table_association" "route_sn_za_pro_pri_3" {
+  subnet_id      = module.aws_sn_za_pro_pri_3.id
   route_table_id = module.aws_private_route_table_za.id
 }
 
 # Associate private networks in zone B to private route table
-resource "aws_route_table_association" "aws_sn_zb_pro_pri_38" {
-  subnet_id      = module.aws_sn_zb_pro_pri_38.id
+resource "aws_route_table_association" "aws_sn_zb_pro_pri_7" {
+  subnet_id      = module.aws_sn_zb_pro_pri_7.id
   route_table_id = module.aws_private_route_table_zb.id
 }

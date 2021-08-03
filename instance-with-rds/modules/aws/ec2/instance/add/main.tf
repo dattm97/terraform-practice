@@ -87,20 +87,20 @@ resource "aws_instance" "default" {
 
 }
 
-resource "aws_route53_record" "private" {
-  zone_id  = var.route53_private_zone_id
-  name     = var.tag_private_name
-  type     = "A"
-  ttl      = "300"
-  records  = [aws_instance.default.private_ip]
-  for_each = local.register_dns_private_each
-}
+# resource "aws_route53_record" "private" {
+#   zone_id  = var.route53_private_zone_id
+#   name     = var.tag_private_name
+#   type     = "A"
+#   ttl      = "300"
+#   records  = [aws_instance.default.private_ip]
+#   for_each = local.register_dns_private_each
+# }
 
-resource "aws_route53_record" "public" {
-  zone_id  = var.route53_public_zone_id
-  name     = var.tag_public_name
-  type     = "A"
-  ttl      = "300"
-  records  = [aws_instance.default.public_ip]
-  for_each = local.register_dns_public_each
-}
+# resource "aws_route53_record" "public" {
+#   zone_id  = var.route53_public_zone_id
+#   name     = var.tag_public_name
+#   type     = "A"
+#   ttl      = "300"
+#   records  = [aws_instance.default.public_ip]
+#   for_each = local.register_dns_public_each
+# }

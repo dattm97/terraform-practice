@@ -9,7 +9,7 @@ module "aws_ec2_pro_pub_wp_01" {
   user_data                   = file("scripts/first-boot.sh")
   disable_api_termination     = var.is_production ? true : false
   vpc_security_group_ids      = [module.aws_sg_ec2_default.id, module.aws_sg_ec2_pro_pub_wp_01.id]
-  subnet_id                   = module.aws_sn_za_pro_pub_32.id
+  subnet_id                   = module.aws_sn_za_pro_pub_1.id
   associate_public_ip_address = var.aws_ec2_pro_pub_wp_01["associate_public_ip_address"]
   instance_tags               = {}
   tag_private_name            = var.aws_ec2_pro_pub_wp_01["tag_private_name"]
@@ -21,11 +21,11 @@ module "aws_ec2_pro_pub_wp_01" {
   tags_environment            = var.aws_ec2_pro_pub_wp_01["tags_environment"]
   tag_cost_center             = var.aws_ec2_pro_pub_wp_01["tag_cost_center"]
 
-  register_dns_private    = true
-  route53_private_zone_id = module.aws_route53_public.id
+  # register_dns_private    = true
+  # route53_private_zone_id = module.aws_route53_public.id
 
-  register_dns_public    = true
-  route53_public_zone_id = module.aws_route53_public.id
+  # register_dns_public    = true
+  # route53_public_zone_id = module.aws_route53_public.id
 
   root_block_device = {
     volume_size           = var.aws_ec2_pro_pub_wp_01["root_block_device_size"]

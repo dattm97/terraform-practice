@@ -3,5 +3,5 @@ output "ec2_public_ip" {
 }
 
 output "endpoint_rds" {
-  value       = module.aws_rds_mariadb_pro_pub_01.endpoint
+  value       = module.aws_rds_mariadb_pro_pri_01.endpoint
 }

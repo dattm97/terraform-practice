@@ -48,25 +48,25 @@ variable "aws_internet_gw_name" {
 # SUBNETS
 # ---------------------------------------------------
 
-#Zone: A, Env: PRO, Type: PUBLIC, Code: 32
-variable "aws_sn_za_pro_pub_32" {
-  description = "Zone: A, Env: PRO, Type: PUBLIC, Code: 32"
+#Zone: A, Env: PRO, Type: PUBLIC, Code: 1
+variable "aws_sn_za_pro_pub_1" {
+  description = "Zone: A, Env: PRO, Type: PUBLIC, Code: 1"
   type        = map(any)
 }
-#Zone: A, Env: PRO, Type: PRIVATE, Code: 34
-variable "aws_sn_za_pro_pri_34" {
-  description = "Zone: A, Env: PRO, Type: PRIVATE, Code: 34"
+#Zone: A, Env: PRO, Type: PRIVATE, Code: 3
+variable "aws_sn_za_pro_pri_3" {
+  description = "Zone: A, Env: PRO, Type: PRIVATE, Code: 3"
   type        = map(any)
 }
 
-#Zone: B, Env: PRO, Type: PUBLIC, Code: 36
-variable "aws_sn_zb_pro_pub_36" {
-  description = "Zone: B, Env: PRO, Type: PUBLIC, Code: 36"
+#Zone: B, Env: PRO, Type: PUBLIC, Code: 5
+variable "aws_sn_zb_pro_pub_5" {
+  description = "Zone: B, Env: PRO, Type: PUBLIC, Code: 5"
   type        = map(any)
 }
-#Zone: B, Env: PRO, Type: PRIVATE, Code: 38
-variable "aws_sn_zb_pro_pri_38" {
-  description = "Zone: B, Env: PRO, Type: PRIVATE, Code: 38"
+#Zone: B, Env: PRO, Type: PRIVATE, Code: 7
+variable "aws_sn_zb_pro_pri_7" {
+  description = "Zone: B, Env: PRO, Type: PRIVATE, Code: 7"
   type        = map(any)
 }
 
@@ -78,8 +78,8 @@ variable "aws_sn_zb_pro_pri_38" {
 # PRO
 #----------------------
 
-variable "aws_rds_sn_pub_pro_01" {
-  description = "RDS Subnet 01, Pub, Env: PRO"
+variable "aws_rds_sn_pri_pro_01" {
+  description = "RDS Subnet 01, Pri, Env: PRO"
   type        = map(any)
 }
 
@@ -129,15 +129,15 @@ variable "aws_route53_public" {
 # RDS MariaDB
 #----------------------
 
-variable "aws_sg_rds_mariadb_pro_pub_01" {
-  description = "Security group for RDS Postgresql"
+variable "aws_sg_rds_mariadb_pro_pri_01" {
+  description = "Security group for RDS MariaDB"
   type        = map(any)
 }
-variable "aws_sr_rds_mariadb_pro_pub_01_instances_to_db_port" {
+variable "aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port" {
   description = "Access from Instances to DB port"
   type        = map(any)
 }
-variable "aws_rds_mariadb_pro_pub_01" {
+variable "aws_rds_mariadb_pro_pri_01" {
   description = "RDS PRO Maria DB 01"
   type        = map(any)
 }

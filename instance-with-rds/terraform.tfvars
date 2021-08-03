@@ -38,33 +38,33 @@ aws_vpc_block    = "172.31.0.0/16" #172.31.0.1 - 172.31.31.254
 #------------------------
 
 #Zone: A, Env: PRO, Type: PUBLIC, Code: 32
-aws_sn_za_pro_pub_32 = {
+aws_sn_za_pro_pub_1 = {
   cidr   = "172.31.1.0/24" #172.31.1.1 - 172.31.2.254
-  name   = "web-sn-za-pro-pub-32"
+  name   = "web-sn-za-pro-pub-1"
   az     = "us-east-1a"
   public = "true"
 }
 
 #Zone: A, Env: PRO, Type: PRIVATE, Code: 34
-aws_sn_za_pro_pri_34 = {
+aws_sn_za_pro_pri_3 = {
   cidr   = "172.31.3.0/24" #172.31.3.1 - 172.31.4.254
-  name   = "web-sn-za-pro-pri-34"
+  name   = "web-sn-za-pro-pri-3"
   az     = "us-east-1a"
   public = "false"
 }
 
 #Zone: B, Env: PRO, Type: PUBLIC, Code: 36
-aws_sn_zb_pro_pub_36 = {
+aws_sn_zb_pro_pub_5 = {
   cidr   = "172.31.5.0/24" #172.31.5.1 - 172.31.6.254
-  name   = "web-sn-zb-pro-pub-36"
+  name   = "web-sn-zb-pro-pub-5"
   az     = "us-east-1b"
-  public = "false"
+  public = "true"
 }
 
 #Zone: B, Env: PRO, Type: PRIVATE, Code: 38
-aws_sn_zb_pro_pri_38 = {
+aws_sn_zb_pro_pri_7 = {
   cidr   = "172.31.7.0/24" #172.31.7.1 - 172.31.8.254
-  name   = "web-sn-zb-pro-pri-38"
+  name   = "web-sn-zb-pro-pri-7"
   az     = "us-east-1b"
   public = "false"
 }
@@ -72,9 +72,9 @@ aws_sn_zb_pro_pri_38 = {
 #------------------------
 # For RDS instances
 #------------------------
-aws_rds_sn_pub_pro_01 = {
-  name        = "web-rds-sn-pub-pro-01"
-  description = "web-RDS-SN-pub-PRO-01"
+aws_rds_sn_pri_pro_01 = {
+  name        = "web-rds-sn-pri-pro-01"
+  description = "web-RDS-SN-pri-PRO-01"
 
   #See aws_rds_sn_pro.tf for subnet_ids
   #subnet_ids  = ${module.aws_sn_za_pro_pub_32.id},${module.aws_sn_zb_pro_pub_36.id
@@ -165,7 +165,7 @@ aws_sr_rds_mariadb_default_internet_to_db_port = {
 #------------------------
 # MariaDB PRO 01
 #------------------------
-aws_rds_mariadb_pro_pub_01 = {
+aws_rds_mariadb_pro_pri_01 = {
   name                    = "webDB"
   identifier              = "web-rds-mariadb-pro-pub-01"
   allocated_storage       = 20 #GB
@@ -184,8 +184,8 @@ aws_rds_mariadb_pro_pub_01 = {
   vpc_security_group_ids = ""
   parameter_group_name   = ""
   allow_major_version_up = false
-  publicly_accessible    = true
-  tag_private_name       = "web-rds-mariadb-pro-pub-01"
+  publicly_accessible    = false
+  tag_private_name       = "web-rds-mariadb-pro-pri-01"
   tag_public_name        = "web-rds-mariadb-pro-pub-01"
   tag_app                = "mariadb"
   tag_app_id             = "mariadb-01"
@@ -197,15 +197,15 @@ aws_rds_mariadb_pro_pub_01 = {
 #------------------------
 # RDS Security Group
 #------------------------
-aws_sg_rds_mariadb_pro_pub_01 = {
-  sec_name           = "web-aws-sg-rds-mariadb-pro-pub-01"
-  sec_description    = "web - MariaDb server access rules - Pub, Env: PRO"
+aws_sg_rds_mariadb_pro_pri_01 = {
+  sec_name           = "web-aws-sg-rds-mariadb-pro-pri-01"
+  sec_description    = "web - MariaDb server access rules - Pri, Env: PRO"
   allow_all_outbound = false
 }
 #------------------------
 # Allow access from my Instances to DB port
 #------------------------
-aws_sr_rds_mariadb_pro_pub_01_instances_to_db_port = {
+aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port = {
   type      = "ingress"
   from_port = "3306"
   to_port   = "3306"

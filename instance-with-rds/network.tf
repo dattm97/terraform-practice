@@ -27,44 +27,44 @@ module "aws_internet_gw" {
 # Zones
 #-----------------------------------------
 
-#Zone: A, Env: PRO, Type: PUBLIC, Code: 32
-module "aws_sn_za_pro_pub_32" {
+#Zone: A, Env: PRO, Type: PUBLIC, Code: 1
+module "aws_sn_za_pro_pub_1" {
   source = "./modules/aws/network/subnet"
   vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_za_pro_pub_32["cidr"]
-  name   = var.aws_sn_za_pro_pub_32["name"]
-  az     = var.aws_sn_za_pro_pub_32["az"]
-  public = var.aws_sn_za_pro_pub_32["public"]
+  cidr   = var.aws_sn_za_pro_pub_1["cidr"]
+  name   = var.aws_sn_za_pro_pub_1["name"]
+  az     = var.aws_sn_za_pro_pub_1["az"]
+  public = var.aws_sn_za_pro_pub_1["public"]
 }
 
-#Zone: A, Env: PRO, Type: PRIVATE, Code: 34
-module "aws_sn_za_pro_pri_34" {
+#Zone: A, Env: PRO, Type: PRIVATE, Code: 3
+module "aws_sn_za_pro_pri_3" {
   source = "./modules/aws/network/subnet"
   vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_za_pro_pri_34["cidr"]
-  name   = var.aws_sn_za_pro_pri_34["name"]
-  az     = var.aws_sn_za_pro_pri_34["az"]
-  public = var.aws_sn_za_pro_pri_34["public"]
+  cidr   = var.aws_sn_za_pro_pri_3["cidr"]
+  name   = var.aws_sn_za_pro_pri_3["name"]
+  az     = var.aws_sn_za_pro_pri_3["az"]
+  public = var.aws_sn_za_pro_pri_3["public"]
 }
 
-#Zone: B, Env: PRO, Type: PUBLIC, Code: 36
-module "aws_sn_zb_pro_pub_36" {
+#Zone: B, Env: PRO, Type: PUBLIC, Code: 5
+module "aws_sn_zb_pro_pub_5" {
   source = "./modules/aws/network/subnet"
   vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_zb_pro_pub_36["cidr"]
-  name   = var.aws_sn_zb_pro_pub_36["name"]
-  az     = var.aws_sn_zb_pro_pub_36["az"]
-  public = var.aws_sn_zb_pro_pub_36["public"]
+  cidr   = var.aws_sn_zb_pro_pub_5["cidr"]
+  name   = var.aws_sn_zb_pro_pub_5["name"]
+  az     = var.aws_sn_zb_pro_pub_5["az"]
+  public = var.aws_sn_zb_pro_pub_5["public"]
 }
 
-#Zone: B, Env: PRO, Type: PRIVATE, Code: 38
-module "aws_sn_zb_pro_pri_38" {
+#Zone: B, Env: PRO, Type: PRIVATE, Code: 7
+module "aws_sn_zb_pro_pri_7" {
   source = "./modules/aws/network/subnet"
   vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_zb_pro_pri_38["cidr"]
-  name   = var.aws_sn_zb_pro_pri_38["name"]
-  az     = var.aws_sn_zb_pro_pri_38["az"]
-  public = var.aws_sn_zb_pro_pri_38["public"]
+  cidr   = var.aws_sn_zb_pro_pri_7["cidr"]
+  name   = var.aws_sn_zb_pro_pri_7["name"]
+  az     = var.aws_sn_zb_pro_pri_7["az"]
+  public = var.aws_sn_zb_pro_pri_7["public"]
 }
 
 #----------------------
@@ -74,15 +74,15 @@ module "aws_sn_zb_pro_pri_38" {
 #----------------------
 # PRO
 #----------------------
-module "aws_rds_sn_pub_pro_01" {
+module "aws_rds_sn_pri_pro_01" {
   source      = "./modules/aws/rds/subnet"
-  name        = var.aws_rds_sn_pub_pro_01["name"]
-  description = var.aws_rds_sn_pub_pro_01["description"]
+  name        = var.aws_rds_sn_pri_pro_01["name"]
+  description = var.aws_rds_sn_pri_pro_01["description"]
 
   # Add 2 PRIVATE Subnets from two availability zones
-  subnet_ids = [module.aws_sn_za_pro_pub_32.id, module.aws_sn_zb_pro_pub_36.id]
+  subnet_ids = [module.aws_sn_za_pro_pri_3.id, module.aws_sn_zb_pro_pri_7.id]
   # Add 1 PRIVATE Subnets from two availability zones
-  #subnet_ids  = [module.aws_sn_za_pro_pub_32.id]
+  #subnet_ids  = [module.aws_sn_za_pro_pri_3.id]
 }
 
 
