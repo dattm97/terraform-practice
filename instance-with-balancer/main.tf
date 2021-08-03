@@ -6,10 +6,10 @@ resource "aws_instance" "instance-app" {
   for_each                    = var.app_names
   ami                         = lookup(var.awsprops, "ami")
   instance_type               = lookup(var.awsprops, "type")
-  associate_public_ip_address = lookup(var.awsprops, "publicip")
+  associate_public_ip_address = true
   key_name                    = aws_key_pair.user_key.key_name
   subnet_id                   = aws_subnet.app.id
-  user_data                   = file("scripts/first-boot.sh")
+  # user_data                   = file("scripts/first-boot.sh")
   vpc_security_group_ids = [
     aws_security_group.app_sg.id
   ]
