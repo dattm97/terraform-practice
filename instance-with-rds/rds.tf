@@ -1,61 +1,80 @@
+# Create subnets in each availability zone for RDS, each with address blocks within the VPC.
+resource "aws_subnet" "rds" {
+  count                   = length(data.aws_availability_zones.available.names)
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "172.31.${length(data.aws_availability_zones.available.names) + count.index}.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
 
-#----------------------
-# RDS MariaDB
-#----------------------
-
-# SECURITY
-# Group
-module "aws_sg_rds_mariadb_pro_pri_01" {
-  source      = "./modules/aws/security/group"
-  vpc_id      = module.aws_network_vpc.id
-  name        = var.aws_sg_rds_mariadb_pro_pri_01["sec_name"]
-  description = var.aws_sg_rds_mariadb_pro_pri_01["sec_description"]
+  tags = {
+    Name = "rds-${element(data.aws_availability_zones.available.names, count.index)}"
+  }
 }
 
-# Rules
-# Access from instances in group aws_sec_group_ec2_default to DB Port
-module "aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port" {
-  source                   = "./modules/aws/security/rule/source_group"
-  security_group_id        = module.aws_sg_rds_mariadb_pro_pri_01.id
-  type                     = var.aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port["type"]
-  from_port                = var.aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port["from_port"]
-  to_port                  = var.aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port["to_port"]
-  protocol                 = var.aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port["protocol"]
-  source_security_group_id = module.aws_sg_ec2_default.id
-  description              = var.aws_sr_rds_mariadb_pro_pri_01_instances_to_db_port["description"]
+# Create a subnet group with all of our RDS subnets. The group will be applied to the database instance.  
+resource "aws_db_subnet_group" "default" {
+  name        = "${var.rds_instance_identifier}-subnet-group"
+  description = "Terraform example RDS subnet group"
+  subnet_ids  = aws_subnet.rds.*.id
 }
 
-module "aws_rds_mariadb_pro_pri_01" {
-  source = "./modules/aws/rds/instance"
+# Create a RDS security group in the VPC which our database will belong to.
+resource "aws_security_group" "rds" {
+  name        = "terraform_rds_security_group"
+  description = "Terraform example RDS Mysql server"
+  vpc_id      = aws_vpc.vpc.id
 
-  name                    = var.aws_rds_mariadb_pro_pri_01["name"]
-  identifier              = var.aws_rds_mariadb_pro_pri_01["identifier"]
-  allocated_storage       = var.aws_rds_mariadb_pro_pri_01["allocated_storage"]
-  storage_type            = var.aws_rds_mariadb_pro_pri_01["storage_type"]
-  final_snapshot_id       = var.aws_rds_mariadb_pro_pri_01["final_snapshot_id"]
-  skip_final_snapshot     = var.aws_rds_mariadb_pro_pri_01["skip_final_snapshot"]
-  engine                  = var.aws_rds_mariadb_pro_pri_01["engine"]
-  engine_version          = var.aws_rds_mariadb_pro_pri_01["engine_version"]
-  instance_class          = var.aws_rds_mariadb_pro_pri_01["instance_class"]
-  password                = var.aws_rds_mariadb_pro_pri_01["password"]
-  username                = var.aws_rds_mariadb_pro_pri_01["username"]
-  availability_zone       = var.aws_rds_mariadb_pro_pri_01["availability_zone"]
-  backup_retention_period = var.aws_rds_mariadb_pro_pri_01["backup_retention_period"]
+  # Keep the instance private by only allowing traffic from the web server.
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.default.id]
+  }
 
-  # Workaround for dependency. We need Terraform to wait for aws_rds_sn_pro_01 creation before the RDS DB can use it.
-  db_subnet_group_name = module.aws_rds_sn_pri_pro_01.id #aws_rds_sn_pro_01["name"]
+  # Allow all outbound traffic.
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-  multi_az               = var.aws_rds_mariadb_pro_pri_01["multi_az"]
-  vpc_security_group_ids = [module.aws_sg_rds_mariadb_pro_pri_01.id]
-  publicly_accessible    = var.aws_rds_mariadb_pro_pri_01["publicly_accessible"]
+  tags = {
+    Name = "terraform-example-rds-security-group"
+  }
+}
 
-  #parameter_group_name    = aws_db_parameter_group.rds_pos_96_db_parameter_group_01.id
-  allow_major_version_up = var.aws_rds_mariadb_pro_pri_01["allow_major_version_up"]
-  tag_private_name       = var.aws_rds_mariadb_pro_pri_01["tag_private_name"]
-  tag_public_name        = var.aws_rds_mariadb_pro_pri_01["tag_public_name"]
-  tag_app                = var.aws_rds_mariadb_pro_pri_01["tag_app"]
-  tag_app_id             = var.aws_rds_mariadb_pro_pri_01["tag_app_id"]
-  tag_os                 = var.aws_rds_mariadb_pro_pri_01["tag_os"]
-  tags_environment       = var.aws_rds_mariadb_pro_pri_01["tags_environment"]
-  tag_cost_center        = var.aws_rds_mariadb_pro_pri_01["tag_cost_center"]
+# Create a RDS MySQL database instance in the VPC with our RDS subnet group and security group.
+resource "aws_db_instance" "default" {
+  identifier                = var.rds_instance_identifier
+  allocated_storage         = 5
+  engine                    = "mysql"
+  engine_version            = "5.6.35"
+  instance_class            = "db.t2.micro"
+  name                      = var.database_name
+  username                  = var.database_user
+  password                  = var.database_password
+  db_subnet_group_name      = aws_db_subnet_group.default.id
+  vpc_security_group_ids    = [aws_security_group.rds.id]
+  skip_final_snapshot       = true
+  publicly_accessible       = true
+  final_snapshot_identifier = "Ignore"
+}
+
+# Manage the MySQL configuration by creating a parameter group.
+resource "aws_db_parameter_group" "default" {
+  name        = "${var.rds_instance_identifier}-param-group"
+  description = "Terraform example parameter group for mysql5.6"
+  family      = "mysql5.6"
+
+  parameter {
+    name  = "character_set_server"
+    value = "utf8"
+  }
+
+  parameter {
+    name  = "character_set_client"
+    value = "utf8"
+  }
 }

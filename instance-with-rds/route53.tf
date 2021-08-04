@@ -1,25 +1,12 @@
+# Define a record set in Route 53 for the load balancer.
+# resource "aws_route53_record" "terraform" {
+#   zone_id = data.aws_route53_zone.zone.zone_id
+#   name    = "terraform.${var.route53_hosted_zone_name}"
+#   type    = "A"
 
-#------------------------
-# ROUTE 53 (DNS)
-#------------------------
-
-#------------------------
-# Public
-#------------------------
-
-module "aws_route53_delegation_set" {
-  source         = "./modules/aws/route53/delegation_set"
-  reference_name = var.aws_route53_delegation_set_reference_name
-}
-
-module "aws_route53_public" {
-  source            = "./modules/aws/route53/public_zone"
-  name              = var.aws_route53_public["name"]
-  delegation_set_id = module.aws_route53_delegation_set.id
-
-  comment = var.aws_route53_public["comment"]
-
-  #TAGS
-  tags_environment = var.aws_route53_public["tags_environment"]
-
-}
+#   alias {
+#     name                   = aws_alb.alb.dns_name
+#     zone_id                = aws_alb.alb.zone_id
+#     evaluate_target_health = true
+#   }
+# }

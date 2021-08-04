@@ -1,106 +1,38 @@
-# Network configuration
+# Create a VPC to launch our instances into.
+resource "aws_vpc" "vpc" {
+  cidr_block           = "172.31.0.0/16"
+  enable_dns_hostnames = true
 
-#-----------------------------------------
-# VPC
-#-----------------------------------------
-
-#Create a VPC
-module "aws_network_vpc" {
-  source           = "./modules/aws/network/vpc"
-  aws_vpc_block    = var.aws_vpc_block
-  aws_vpc_tag_name = var.aws_vpc_tag_name
+  tags = {
+    Name = "terraform-example-vpc"
+  }
 }
 
-#----------------------
-# AWS Internet Gateway
-#----------------------
+# Create an internet gateway to give our subnet access to the outside world.
+resource "aws_internet_gateway" "gateway" {
+  vpc_id = aws_vpc.vpc.id
 
-#Create an Internet GW
-module "aws_internet_gw" {
-  source = "./modules/aws/network/internet_gateway"
-  vpc_id = module.aws_network_vpc.id
-  name   = var.aws_internet_gw_name
+  tags = {
+    Name = "terraform-example-internet-gateway"
+  }
 }
 
-
-#-----------------------------------------
-# Zones
-#-----------------------------------------
-
-#Zone: A, Env: PRO, Type: PUBLIC, Code: 1
-module "aws_sn_za_pro_pub_1" {
-  source = "./modules/aws/network/subnet"
-  vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_za_pro_pub_1["cidr"]
-  name   = var.aws_sn_za_pro_pub_1["name"]
-  az     = var.aws_sn_za_pro_pub_1["az"]
-  public = var.aws_sn_za_pro_pub_1["public"]
+# Grant the VPC internet access on its main route table.
+resource "aws_route" "route" {
+  route_table_id         = aws_vpc.vpc.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gateway.id
 }
 
-#Zone: A, Env: PRO, Type: PRIVATE, Code: 3
-module "aws_sn_za_pro_pri_3" {
-  source = "./modules/aws/network/subnet"
-  vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_za_pro_pri_3["cidr"]
-  name   = var.aws_sn_za_pro_pri_3["name"]
-  az     = var.aws_sn_za_pro_pri_3["az"]
-  public = var.aws_sn_za_pro_pri_3["public"]
+# Create subnets in each availability zone to launch our instances into, each with address blocks within the VPC.
+resource "aws_subnet" "main" {
+  count                   = length(data.aws_availability_zones.available.names)
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "172.31.${count.index}.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
+
+  tags = {
+    Name = "public-${element(data.aws_availability_zones.available.names, count.index)}"
+  }
 }
-
-#Zone: B, Env: PRO, Type: PUBLIC, Code: 5
-module "aws_sn_zb_pro_pub_5" {
-  source = "./modules/aws/network/subnet"
-  vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_zb_pro_pub_5["cidr"]
-  name   = var.aws_sn_zb_pro_pub_5["name"]
-  az     = var.aws_sn_zb_pro_pub_5["az"]
-  public = var.aws_sn_zb_pro_pub_5["public"]
-}
-
-#Zone: B, Env: PRO, Type: PRIVATE, Code: 7
-module "aws_sn_zb_pro_pri_7" {
-  source = "./modules/aws/network/subnet"
-  vpc_id = module.aws_network_vpc.id
-  cidr   = var.aws_sn_zb_pro_pri_7["cidr"]
-  name   = var.aws_sn_zb_pro_pri_7["name"]
-  az     = var.aws_sn_zb_pro_pri_7["az"]
-  public = var.aws_sn_zb_pro_pri_7["public"]
-}
-
-#----------------------
-# SUBNET for RDS
-#----------------------
-
-#----------------------
-# PRO
-#----------------------
-module "aws_rds_sn_pri_pro_01" {
-  source      = "./modules/aws/rds/subnet"
-  name        = var.aws_rds_sn_pri_pro_01["name"]
-  description = var.aws_rds_sn_pri_pro_01["description"]
-
-  # Add 2 PRIVATE Subnets from two availability zones
-  subnet_ids = [module.aws_sn_za_pro_pri_3.id, module.aws_sn_zb_pro_pri_7.id]
-  # Add 1 PRIVATE Subnets from two availability zones
-  #subnet_ids  = [module.aws_sn_za_pro_pri_3.id]
-}
-
-
-
-# # Subnet configuration
-# resource "aws_subnet" "http" {
-#   vpc_id     = aws_vpc.terraform.id
-#   cidr_block = var.network_http["cidr"]
-#   tags = {
-#     Name = "subnet-http"
-#   }
-#   depends_on = [aws_internet_gateway.gw]
-# }
-
-# # External gateway configuration
-# resource "aws_internet_gateway" "gw" {
-#   vpc_id = aws_vpc.terraform.id
-#   tags = {
-#     Name = "internet-gateway"
-#   }
-# }

@@ -1,7 +1,8 @@
-output "ec2_public_ip" {
-  value = module.aws_ec2_pro_pub_wp_01.public_ip
+# Define the load balancer DNS name as an output variable.
+output "lb_dns_name" {
+  value = aws_alb.alb.dns_name
 }
 
-output "endpoint_rds" {
-  value       = module.aws_rds_mariadb_pro_pri_01.endpoint
+output "db_endpoint" {
+  value = aws_db_instance.default.endpoint
 }
