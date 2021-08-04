@@ -32,6 +32,14 @@ resource "aws_security_group" "rds" {
     security_groups = [aws_security_group.default.id]
   }
 
+  # Allow access from My IP to DB Port
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [format("%s/%s", data.external.whatismyip.result["internet_ip"], 32)]
+  }
+
   # Allow all outbound traffic.
   egress {
     from_port   = 0
@@ -50,7 +58,7 @@ resource "aws_db_instance" "default" {
   identifier                = var.rds_instance_identifier
   allocated_storage         = 5
   engine                    = "mysql"
-  engine_version            = "5.6.35"
+  engine_version            = "5.7.35"
   instance_class            = "db.t2.micro"
   name                      = var.database_name
   username                  = var.database_user

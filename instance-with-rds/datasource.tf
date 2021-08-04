@@ -19,3 +19,7 @@ data "template_file" "provision" {
     s3_bucket_name    = var.s3_bucket_name
   }
 }
+
+data "external" "whatismyip" {
+  program = ["/bin/bash", "${path.module}/scripts/whatismyip.sh"]
+}
